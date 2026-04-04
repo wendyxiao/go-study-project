@@ -1,0 +1,19 @@
+# configs/app.yaml
+server:
+  port: 8080
+  mode: "release"  # debug/release/test
+
+database:
+  driver: "mysql"
+  dsn: "root:X420440./xiao@tcp(127.0.0.1:3306)/godb?charset=utf8mb4&parseTime=True&loc=Local"
+  max_open_conns: 20
+  max_idle_conns: 10
+  conn_max_lifetime: 3600  # 秒
+
+log:
+    level: "info"       # 日志级别（debug/info/warn/error）
+    path: "./logs/app.log"  # 日志文件路径（相对/绝对路径）
+    max_size: 100       # 单文件最大尺寸（MB）
+    max_backups: 5      # 最大备份文件数
+    max_age: 30         # 文件保留天数（天）
+    compress: true      # 是否压缩备份文件（gzip）

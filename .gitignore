@@ -1,0 +1,22 @@
+# Go 编译产物
+*.exe
+*.out
+*.test
+bin/
+build/
+
+# Go Modules 依赖
+vendor/
+go.sum  # 可选：若需锁定依赖版本，可保留；否则排除
+*.mod.cached
+
+# IDE 配置
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 日志与临时文件
+logs/
+tmp/
+.env
