@@ -21,6 +21,10 @@ type DatabaseConfig struct {
 	ConnMaxLifetime time.Duration `mapstructure:"conn_max_lifetime"`
 	Log             LogConfig     `mapstructure:"log"`
 }
+type JWT struct {
+	Secret    string `mapstructure:"secret"`
+	ExpiresIn int    `mapstructure:"expires_in"`
+}
 
 // LogConfig 日志配置
 type LogConfig struct {
@@ -37,6 +41,7 @@ type AppConfig struct {
 	Server   ServerConfig   `mapstructure:"server"`
 	Database DatabaseConfig `mapstructure:"database"`
 	Log      LogConfig      `mapstructure:"log"`
+	JWT      JWT            `mapstructure:"jwt"`
 }
 
 // LoadConfig 加载配置（Viper实现）

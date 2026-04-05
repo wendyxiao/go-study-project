@@ -9,7 +9,9 @@ database:
   max_open_conns: 20
   max_idle_conns: 10
   conn_max_lifetime: 3600  # 秒
-
+jwt:
+  secret: "your-strong-secret-key-here" # 生产环境用环境变量注入
+  expires_in: 86400 # 过期时间（秒）
 log:
     level: "info"       # 日志级别（debug/info/warn/error）
     path: "./logs/app.log"  # 日志文件路径（相对/绝对路径）

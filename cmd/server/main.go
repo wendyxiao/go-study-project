@@ -44,7 +44,7 @@ func main() {
 
 	userSvc := service.NewUserService(db, zapLogger, &cfg)
 	// 5. 注册API路由
-	api.RegisterUserRoutes(apiV1, userSvc, zapLogger) // 传递db给API层
+	api.RegisterUserRoutes(apiV1, userSvc, zapLogger, &cfg.JWT) // 传递db给API层
 
 	postsrv := service.NewPostService(db, zapLogger)
 	api.RegisterPostoutes(apiV1, postsrv, zapLogger)

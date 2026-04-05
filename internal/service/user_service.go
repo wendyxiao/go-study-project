@@ -1,11 +1,14 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"go-study-project/internal/config" // 替换为你的项目模块路径
 	"go-study-project/internal/model"
 	"go-study-project/internal/repository"
+	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"go.uber.org/zap"            // 日志组件（需提前安装：go get go.uber.org/zap）
 	"golang.org/x/crypto/bcrypt" // 密码加密（需安装：go get golang.org/x/crypto/bcrypt）
 	"gorm.io/gorm"
@@ -91,10 +94,34 @@ func (s *UserServiceImpl) Login(username, password string) (string, error) {
 		return "", fmt.Errorf("err_code:%d,msg:%s", ErrCodeInvalidPass, "密码错误")
 	}
 
-	// 3. 生成Token（简化版：用随机字符串，实际项目用JWT）
-	token := fmt.Sprintf("token_%d_%s", user.ID, "random_secret") // 实际需用JWT签名
-	s.logger.Info("用户登录成功", zap.Uint("user_id", user.ID), zap.String("username", username))
+	// 3. 生成JWT令牌
+	token, err := s.generateJWT(user)
+	if err != nil {
+		s.logger.Error("JWT生成失败", zap.Error(err), zap.Uint("user_id", user.ID))
+		return "", errors.New("登录失败，请重试")
+	}
+
+	s.logger.Info("用户登录成功", zap.Uint("user_id", user.ID), zap.String("username", user.Username))
 	return token, nil
+}
+
+// generateJWT 生成JWT令牌（HS256算法）
+func (s *UserServiceImpl) generateJWT(user *model.User) (string, error) {
+	// JWT载荷（含用户信息与过期时间）
+	claims := model.JWTClaims{
+		UserID:   user.ID,
+		Username: user.Username,
+		Role:     user.Role,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)), // 过期时间：24小时
+			IssuedAt:  jwt.NewNumericDate(time.Now()),                     // 签发时间
+			Issuer:    "go-enterprise-project",                            // 签发者
+		},
+	}
+
+	// 创建JWT令牌（HS256签名）
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(s.cfg.JWT.Secret)) // 密钥从配置读取
 }
 
 // GetUserByID 获取用户详情（含权限校验：仅本人或管理员可查）

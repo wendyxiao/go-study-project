@@ -1,6 +1,8 @@
 package api
 
 import (
+	"go-study-project/internal/config"
+	"go-study-project/internal/middleware"
 	"go-study-project/internal/model"
 	"go-study-project/internal/service"
 	"net/http"
@@ -11,14 +13,14 @@ import (
 )
 
 // RegisterUserRoutes 注册用户相关路由（路由分组管理）
-func RegisterUserRoutes(r *gin.RouterGroup, userSvc service.UserService, logger *zap.Logger) {
+func RegisterUserRoutes(r *gin.RouterGroup, userSvc service.UserService, logger *zap.Logger, jwt *config.JWT) {
 	// 公开接口（无需认证）
 	r.POST("/users/register", createUserHandler(userSvc, logger)) // 用户注册
 	r.POST("/users/login", loginHandler(userSvc, logger))         // 用户登录
-	r.GET("/getusers/:id", getUserHandler(userSvc, logger))
+
 	// 需要认证的接口（需从Token中解析用户ID作为operatorID）
 	authGroup := r.Group("/users")
-	authGroup.Use(authMiddleware(logger)) // 认证中间件（示例，需自行实现）
+	authGroup.Use(middleware.AuthMiddleware(jwt, logger)) // 认证中间件（示例，需自行实现）
 	{
 		authGroup.GET("/:id", getUserHandler(userSvc, logger))       // 获取用户详情
 		authGroup.PUT("/:id", updateUserHandler(userSvc, logger))    // 更新用户
@@ -129,7 +131,7 @@ func getUserHandler(svc service.UserService, logger *zap.Logger) gin.HandlerFunc
 		}
 
 		// 2. 从上下文中获取操作者ID（认证中间件设置）
-		operatorID, exists := c.Get("userID")
+		operatorID, exists := c.Get("user_id")
 		if !exists {
 			logger.Error("无法获取操作者ID")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "服务器内部错误"})
@@ -244,24 +246,5 @@ func deleteUserHandler(svc service.UserService, logger *zap.Logger) gin.HandlerF
 		}
 
 		c.JSON(http.StatusOK, gin.H{"message": "删除成功"})
-	}
-}
-
-// 辅助中间件：认证（示例）
-func authMiddleware(logger *zap.Logger) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// TODO: 实现Token验证逻辑（如JWT解析）
-		// 示例：假设Token中包含用户ID
-		token := c.GetHeader("Authorization")
-		if token == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "未授权"})
-			c.Abort()
-			return
-		}
-
-		// 解析Token获取用户ID（伪代码）
-		userID := uint(1) // 实际应从Token解析
-		c.Set("userID", userID)
-		c.Next()
 	}
 }

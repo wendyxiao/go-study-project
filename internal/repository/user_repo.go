@@ -15,6 +15,7 @@ type UserRepository interface {
 	GetByUsername(username string) (*model.User, error)
 	Update(user *model.User) error
 	Delete(id uint) error
+	GetByEmail(email string) (*model.User, error) // 按邮箱查询
 }
 
 // UserRepo 仓库层实现（依赖GORM DB实例）
@@ -72,6 +73,16 @@ func (r *UserRepo) GetByUsername(username string) (*model.User, error) {
 		return nil, fmt.Errorf("get user by username failed: %w", err)
 	}
 	return &user, nil
+}
+
+// GetByEmail 按邮箱查询用户
+func (r *UserRepo) GetByEmail(email string) (*model.User, error) {
+	var user model.User
+	err := r.db.Where("email = ?", email).First(&user).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, errors.New("user not found")
+	}
+	return &user, err
 }
 
 // Update 更新用户信息（含乐观锁：通过UpdatedAt控制）
