@@ -46,6 +46,12 @@ func main() {
 	// 5. 注册API路由
 	api.RegisterUserRoutes(apiV1, userSvc, zapLogger) // 传递db给API层
 
+	postsrv := service.NewPostService(db, zapLogger)
+	api.RegisterPostoutes(apiV1, postsrv, zapLogger)
+
+	commentRepo := service.NewCommentService(db)
+	api.RegisterCommentoutes(apiV1, commentRepo, zapLogger)
+
 	// 6. 启动服务
 	log.Printf("server starting on :%s", cfg.Server.Port)
 	if err := r.Run(":" + cfg.Server.Port); err != nil {

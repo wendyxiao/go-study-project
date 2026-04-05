@@ -19,6 +19,7 @@ type DatabaseConfig struct {
 	MaxOpenConns    int           `mapstructure:"max_open_conns"`
 	MaxIdleConns    int           `mapstructure:"max_idle_conns"`
 	ConnMaxLifetime time.Duration `mapstructure:"conn_max_lifetime"`
+	Log             LogConfig     `mapstructure:"log"`
 }
 
 // LogConfig 日志配置

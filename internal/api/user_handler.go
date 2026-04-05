@@ -15,7 +15,7 @@ func RegisterUserRoutes(r *gin.RouterGroup, userSvc service.UserService, logger 
 	// 公开接口（无需认证）
 	r.POST("/users/register", createUserHandler(userSvc, logger)) // 用户注册
 	r.POST("/users/login", loginHandler(userSvc, logger))         // 用户登录
-
+	r.GET("/getusers/:id", getUserHandler(userSvc, logger))
 	// 需要认证的接口（需从Token中解析用户ID作为operatorID）
 	authGroup := r.Group("/users")
 	authGroup.Use(authMiddleware(logger)) // 认证中间件（示例，需自行实现）

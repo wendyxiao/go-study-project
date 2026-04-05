@@ -35,6 +35,12 @@ func InitDB(cfg config.DatabaseConfig) (*gorm.DB, error) {
 	if err := db.AutoMigrate(&model.User{}); err != nil {
 		return nil, fmt.Errorf("auto migrate failed: %w", err)
 	}
+	if err := db.AutoMigrate(&model.Post{}); err != nil {
+		return nil, fmt.Errorf("auto migrate failed: %w", err)
+	}
+	if err := db.AutoMigrate(&model.Comment{}); err != nil {
+		return nil, fmt.Errorf("auto migrate failed: %w", err)
+	}
 
 	return db, nil
 }

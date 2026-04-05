@@ -4,6 +4,7 @@ go 1.26
 
 require (
 	github.com/gin-gonic/gin v1.9.1
+	github.com/pkg/errors v0.9.1
 	github.com/spf13/viper v1.18.2
 	go.uber.org/zap v1.26.0
 	golang.org/x/crypto v0.49.0
